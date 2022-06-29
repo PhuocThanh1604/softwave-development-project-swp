@@ -51,9 +51,6 @@ public class RoomCategoryController {
         if(roomCategory.getPrice() != 0)
             thisCategory.setPrice(roomCategory.getPrice());
 
-
-
-
         thisCategory.setStatus(roomCategory.isStatus());
         thisCategory= roomCategoryRepository.save(thisCategory); // save into db
         return new ResponseEntity<>(thisCategory, HttpStatus.OK);

@@ -70,7 +70,7 @@ public class RoomController {
 
     /* Update roomCate for Room */
     @PutMapping("/update/{id}/roomcategory/{cate_id}")
-    public ResponseEntity<?> updateCateforRoom(
+    public ResponseEntity<?> updateCategoryforRoom(
             @PathVariable Long id,
             @PathVariable Long cate_id
     ) throws Exception {
@@ -95,9 +95,9 @@ public class RoomController {
 
     }
 
-    /* Update RoomStatus for Room */
-    @PutMapping("/updatecate/{id}/roomstatus/{Status_id}")
-    public ResponseEntity<?> updateCateforRoomStatus(
+    /* Update roomStatus for Room */
+    @PutMapping("/update/{id}/roomstatus/{cate_id}")
+    public ResponseEntity<?> updateRoomStatusforRoom(
             @PathVariable Long id,
             @PathVariable Long status_id
     ) throws Exception {
@@ -107,11 +107,12 @@ public class RoomController {
         }
 
         Optional<RoomStatus> roomStatus = roomStatusRepository.findById(status_id);
-        if(!roomStatus.isPresent()) {
+        if(!roomStatus.isPresent()){
             throw new Exception("RoomStatus not found");
         }
 
-        /* Set roomStatus to room */
+
+        /* Set status to room */
         Room thisRoom = room.get();
         thisRoom.setRoomStatus(roomStatus.get());
 
@@ -120,34 +121,6 @@ public class RoomController {
         return new ResponseEntity<>(thisRoom, HttpStatus.OK);
 
     }
-
-//    /* Update roomStatus for Room */
-//    @PutMapping("/updatestatus/{id}/roomstatus/{status_id}")
-//    public ResponseEntity<?> updateCateAndStatusforRoom(
-//            @PathVariable Long id,
-//            @PathVariable Long status_id
-//    ) throws Exception {
-//
-//        Optional<Room> room = roomRepository.findById(id);
-//        if(!room.isPresent()){
-//            throw new Exception("Room not found");
-//        }
-//
-//        Optional<RoomStatus> status = roomStatusRepository.findById(status_id);
-//        if(!status.isPresent()){
-//            throw new Exception("status not found");
-//        }
-//
-//        /* Set category to room */
-//        Room thisRoom = room.get();
-//        RoomStatus thisStatus = status.get();
-//        thisRoom.setRoomStatus(thisStatus);
-//
-//        thisRoom = roomRepository.save(thisRoom);
-//
-//        return new ResponseEntity<>(thisRoom, HttpStatus.OK);
-//
-//    }
 
 
 }
