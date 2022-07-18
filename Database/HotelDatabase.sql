@@ -199,7 +199,7 @@ Check in: 27-05-2022
 
 /*tblBookingDetail*/
     INSERT INTO BookingDetail (roomID,bookingID,checkInTime,checkOutTime,roomCategoryID,totalRoom, total,status)
-    VALUES (1,1,'2022-06-28 8:15:09','2022-06-29 8:15:09',2,500.000,500.000,1);
+    VALUES (1,1,'2022-06-28 8:15:09','2022-06-29 8:15:09',3,500.000,500.000,1);
 
 
 select *from Role;
@@ -217,3 +217,4 @@ select * from bookingStatus;
 select *
 from Booking;
 select * from roomCategory
+
