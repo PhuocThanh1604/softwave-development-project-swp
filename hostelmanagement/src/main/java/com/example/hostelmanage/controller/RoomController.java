@@ -14,6 +14,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/room")
+@CrossOrigin(origins = "http://localhost:3000")
 public class RoomController {
 
     @Inject
