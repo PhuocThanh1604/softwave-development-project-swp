@@ -122,6 +122,9 @@ ALTER TABLE  Room ADD CONSTRAINT FK_roomStatusID
         
 ALTER TABLE Booking  ADD CONSTRAINT FK_bookingStatusID
 		FOREIGN KEY (bookingStatusID) REFERENCES BookingStatus(bookingStatusID);/*oK*/
+        
+ALTER TABLE BookingDetail ADD CONSTRAINT FK_roomCategoryID_Detail
+		FOREIGN KEY (roomCategoryID) REFERENCES RoomCategory(roomCategoryID);/*oK*/
 
 /*INSERT DATA*/
 /*Role*/
