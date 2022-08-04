@@ -9,7 +9,7 @@ CREATE PROCEDURE SearchtoCheckIn(
 )
 BEGIN
 SELECT
-    booking.id as bookingid,
+    booking.id as id,
     booking.booking_time,
     booking.id as value,
 booking.people as people,
@@ -19,7 +19,8 @@ profile.full_name,
 booking_detail.check_in_time,
 booking_detail.check_out_time,
 room_category.name as category,
-room_category.id as category_id
+room_category.id as category_id,
+room_category.price as category_price
 FROM booking_detail
     INNER JOIN booking
 ON booking_detail.fk_booking = booking.id
