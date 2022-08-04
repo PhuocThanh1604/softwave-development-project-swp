@@ -4,11 +4,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.http.HttpHeaders;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
 import java.security.Key;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Component
 public class JwtService {
@@ -19,9 +24,20 @@ public class JwtService {
     static final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     // Generate JWT token
-    public String getToken(String email) {
+    public String generateJwtToken(Authentication authentication) {
+
+        UserDetailsImpl userPrincipal = (UserDetailsImpl) authentication.getPrincipal();
+
+        List<String> roles = userPrincipal.getAuthorities().stream()
+                .map(item -> item.getAuthority())
+                .collect(Collectors.toList());
+
+        Map<String,Object> claims = new HashMap<>();
+        claims.put("sub", userPrincipal.getEmail());
+        claims.put("roles", roles);
+
         String token = Jwts.builder()
-                .setSubject(email)
+                .setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATIONTIME))
                 .signWith(key)
                 .compact();
@@ -40,8 +56,6 @@ public class JwtService {
                     .parseClaimsJws(token.replace(PREFIX, ""))
                     .getBody()
                     .getSubject();
-
-            System.out.println("User after verifying: " + user);
 
             if (user != null)
                 return user;
