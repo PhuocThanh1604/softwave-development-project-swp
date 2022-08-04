@@ -1,6 +1,6 @@
 package com.example.hostelmanage.controller;
 
-import com.example.hostelmanage.domain.CheckOutDomain;
+import com.example.hostelmanage.domain.BookingDomain;
 import com.example.hostelmanage.model.*;
 import com.example.hostelmanage.repository.*;
 import org.springframework.http.HttpStatus;
@@ -30,25 +30,27 @@ public class CheckOutController {
     public BookingDetailRepository bookingDetailRepository;
 
 
-    @GetMapping("/room/{room_id}/time/{today}")
-    public ResponseEntity<?> searchToCheckOut(@PathVariable Long room_id, @PathVariable String today) throws Exception {
-        Map<String, Long> booking =  bookingRepository.searchtoCheckOut(today, room_id);
+    @GetMapping("/information/room/{room_id}")
+    public ResponseEntity<?> searchToCheckOut(@PathVariable Long room_id) throws Exception {
+        Map<String, Long> booking =  bookingRepository.searchtoCheckOut(room_id);
         return new ResponseEntity<>(booking, HttpStatus.OK);
     }
 
     @PutMapping("/booking/{booking_id}/room/{room_id}")
-    public ResponseEntity<?> checkOut(@PathVariable Long booking_id, @PathVariable Long room_id, @RequestBody CheckOutDomain checkoutData)throws Exception {
+    public ResponseEntity<?> checkOut(@PathVariable Long booking_id, @PathVariable Long room_id, @RequestBody BookingDomain bookingDomain)throws Exception {
         // Booking complete
         Optional<Booking> booking = bookingRepository.findById(booking_id);
         Booking thisBooking = booking.get();
         Optional<BookingStatus> bookingStatus = bookingStatusRepository.findById(Long.valueOf(2));
-        thisBooking.setSurcharge(checkoutData.getExtra());
+        thisBooking.setPrepayment(thisBooking.getPrepayment() + bookingDomain.getPrepayment());
+        thisBooking.setSurcharge(thisBooking.getSurcharge() + bookingDomain.getSurcharge());
         thisBooking.setBookingStatus(bookingStatus.get());
+
 
         // Set total for booking detail
         Optional<BookingDetail> bookingDetail = bookingDetailRepository.findBookingDetailByBookingId(thisBooking.getId());
         BookingDetail thisBookingDetail = bookingDetail.get();
-        thisBookingDetail.setTotal(checkoutData.getTotal());
+        thisBookingDetail.setTotalRoom(bookingDomain.getTotal_room());
 
         // Room available
         Optional<Room> room = roomRepository.findById(room_id);
@@ -61,6 +63,6 @@ public class CheckOutController {
         bookingRepository.save(thisBooking);
         bookingDetailRepository.save(thisBookingDetail);
         roomRepository.save(thisRoom);
-        return new ResponseEntity<>(HttpStatus.OK);
+        return new ResponseEntity<>(thisBookingDetail, HttpStatus.OK);
     }
 }
