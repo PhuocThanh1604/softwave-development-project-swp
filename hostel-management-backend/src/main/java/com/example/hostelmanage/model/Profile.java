@@ -21,7 +21,7 @@ public class Profile {
     private Long id;
 
     @Column
-    private String fullName, dob, cardNumber;
+    private String fullName, cardNumber;
 
     @Column(columnDefinition="TEXT")
     private String picture;

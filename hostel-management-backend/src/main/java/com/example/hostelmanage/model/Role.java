@@ -1,18 +1,12 @@
 package com.example.hostelmanage.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.DynamicUpdate;
-import javax.persistence.Table;
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
 
 import javax.persistence.*;
-import java.util.Set;
 
 @Getter
 @Setter
@@ -30,7 +24,7 @@ public class Role {
     @Column
     private boolean status;
 
-    @JsonIgnore
-    @OneToMany(mappedBy="role", cascade = CascadeType.ALL)
-    private Set<Account> account;
+//    @JsonIgnore
+//    @OneToMany(mappedBy="role", cascade = CascadeType.ALL)
+//    private Set<Account> account;
 }

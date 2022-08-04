@@ -26,9 +26,20 @@ public class Account {
     @Column
     private String password;
 
-    @ManyToOne
-    @JoinColumn(name = "fk_role", referencedColumnName = "id" )
-    private Role role;
+//    @ManyToOne
+//    @JoinColumn(name = "fk_role", referencedColumnName = "id" )
+//    private Role role;
+
+    @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.ALL)
+    @JoinTable(
+            joinColumns = {
+                    @JoinColumn(name = "USER_ID")
+            },
+            inverseJoinColumns = {
+                    @JoinColumn(name = "ROLE_ID")
+            }
+    )
+    private Set<Role> roles;
 
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "fk_profile", referencedColumnName = "id")

@@ -32,7 +32,7 @@ public class Booking {
     private String bookingTime, note;
 
     @Column
-    private double price, surcharge, prepayment;
+    private double surcharge, prepayment;
 
     @Column
     private int people, quantity;

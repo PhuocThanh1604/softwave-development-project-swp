@@ -26,14 +26,15 @@ public class RoomCategory {
     @Column(unique=true)
     private String name, slug;
 
-    @Column(columnDefinition="TEXT")
+    @Lob
+    @Column
     private String image, description;
 
     @Column
     private double price;
 
     @Column
-    private int people, quantity;
+    private int people, bed, bath;
 
 
     @Column
