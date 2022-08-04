@@ -1,23 +1,15 @@
 package com.example.hostelmanage.domain;
 
 public class AccountCredentials {
-    private String email, password, role;
+    private String email, password;
 
 
     public AccountCredentials(){}
 
-    public String getRole() {
-        return role;
-    }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public AccountCredentials(String email, String password, String role) {
+    public AccountCredentials(String email, String password) {
         this.email = email;
         this.password = password;
-        this.role = role;
     }
 
     public String getEmail() {
