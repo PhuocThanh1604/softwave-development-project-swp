@@ -3,25 +3,26 @@
 SELECT * FROM hotelmanagement.booking;
 
 USE hotelmanagement
+USE hotelmanagement
 DELIMITER //
 
 CREATE PROCEDURE SearchtoCheckOut(
-    IN checkOutTime varchar(20),
     IN roomID long
 )
 BEGIN
 SELECT
-    booking.id as bookingId,
+    booking.id,
     booking.prepayment,
+    booking.surcharge,
     booking_detail.check_in_time,
     booking_detail.check_out_time,
-    (booking_detail.total_room - booking.prepayment) as mustpay,
     DATEDIFF(CURDATE(), booking_detail.check_out_time) as overTime,
     account.email,
+    account.phone,
     profile.card_number,
     profile.full_name,
     booking_detail.total_room,
-    room_category.price as roomCategoryPrice
+    room_category.price as roomcate_price
 FROM booking_detail
          INNER JOIN booking
                     ON booking_detail.fk_booking = booking.id
@@ -32,11 +33,10 @@ FROM booking_detail
          INNER JOIN  profile
                      ON account.fk_profile = profile.id
 WHERE booking.fk_bookingstatus = 4
-  AND booking_detail.check_out_time = checkOutTime
   AND booking_detail.fk_room = roomID;
 END //
 
 DELIMITER ;
 
-CALL SearchtoCheckOut("2022-07-13", 19)
+CALL SearchtoCheckOut(19)
 
