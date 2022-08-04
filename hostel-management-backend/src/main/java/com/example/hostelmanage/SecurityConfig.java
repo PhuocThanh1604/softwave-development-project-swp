@@ -67,7 +67,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS).and()
                 .authorizeRequests()
                 // POST request to /login endpoint is not secured
-                .antMatchers( "/booking/**", "/checkout/**", "/checkin/**", "/login", "/account/create/**", "/account/**", "/role/**", "/roomcategory/**", "/roomstatus/**", "/room/**", "/bookingdetail/**", "/bookingstatus/**" ).permitAll()
+                .antMatchers( "/auth/**", "/api/test/**","/booking/**", "/checkout/**", "/checkin/**", "/login", "/account/create/**", "/account/**", "/role/**", "/roomcategory/**", "/roomstatus/**", "/room/**", "/bookingdetail/**", "/bookingstatus/**" ).permitAll()
                 // All other requests are secured
                 .anyRequest().authenticated().and()
                 .exceptionHandling()
