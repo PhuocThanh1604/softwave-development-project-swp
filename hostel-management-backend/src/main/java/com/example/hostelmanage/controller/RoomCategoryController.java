@@ -27,13 +27,6 @@ public class RoomCategoryController {
         return new ResponseEntity<>(list, HttpStatus.OK);
     }
 
-    /* Serch available room with the time and people quantity */
-    @GetMapping("/search/{checkInTime}/to/{checkOutTime}/p/{people}")
-    public ResponseEntity<?> bookingWithTimeAndQtt(@PathVariable String checkInTime, @PathVariable String checkOutTime, @PathVariable int people){
-        List<Map<String, Object>> list = roomCategoryRepository.bookingWithTimeAndQtt(checkInTime, checkOutTime, people);
-        return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
     @PostMapping("/create")
     public ResponseEntity<RoomCategory> createRoomCate(@RequestBody RoomCategory roomCategory){
         roomCategory.setSlug(Slug.makeSlug(roomCategory.getName()));
@@ -83,14 +76,18 @@ public class RoomCategoryController {
 
         RoomCategory thisCategory = category.get();
 
-        if(roomCategory.getName() != null)
+        if(!roomCategory.getName().equals(""))
             thisCategory.setName(roomCategory.getName());
-        if(roomCategory.getDescription() != null)
+        if(!roomCategory.getDescription().equals(""))
             thisCategory.setDescription(roomCategory.getDescription());
         if(roomCategory.getPeople() != 0)
             thisCategory.setPeople(roomCategory.getPeople());
         if(roomCategory.getPrice() != 0)
             thisCategory.setPrice(roomCategory.getPrice());
+        if(roomCategory.getBed() != 0)
+            thisCategory.setBed(roomCategory.getBed());
+        if(roomCategory.getBath() != 0)
+            thisCategory.setBath(roomCategory.getBath());
 
         thisCategory.setStatus(roomCategory.isStatus());
         thisCategory= roomCategoryRepository.save(thisCategory); // save into db
