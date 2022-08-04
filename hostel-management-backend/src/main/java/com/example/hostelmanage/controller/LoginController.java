@@ -40,6 +40,7 @@ public class LoginController {
         if(!account.isPresent()){
             return new ResponseEntity<>(HttpStatus.NON_AUTHORITATIVE_INFORMATION);
         }
+
         Account thisAccount = account.get();
 
         UsernamePasswordAuthenticationToken creds =
@@ -52,11 +53,10 @@ public class LoginController {
         System.out.println("Authentication: " + auth);
 
         // Generate token
-        String jwts = jwtService.getToken(auth.getName());
+        String jwts = jwtService.generateJwtToken(auth);
 
         // Build response with the generated token
         return ResponseEntity.ok()
-
                 .header(HttpHeaders.AUTHORIZATION, "Bearer " + jwts)
                 .header(HttpHeaders.ACCESS_CONTROL_EXPOSE_HEADERS, "Authorization")
                 .body(thisAccount);
