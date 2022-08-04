@@ -43,11 +43,17 @@ public class BookingController {
     @Inject
     private RoleRepository roleRepository;
 
+    /* Search to booking */
+    @GetMapping("/search/{checkInTime}/to/{checkOutTime}/p/{people}")
+    public ResponseEntity<?> bookingWithTimeAndQtt(@PathVariable String checkInTime, @PathVariable String checkOutTime, @PathVariable int people){
+        List<Map<String, Object>> list = roomCategoryRepository.bookingWithTimeAndQtt(checkInTime, checkOutTime, people);
+        return new ResponseEntity<>(list, HttpStatus.OK);
+    }
+
     /* Create a booking with category for user */
     @PostMapping("/user/create/roomCategory/{cate_id}")
     public ResponseEntity<?> createABookingforUser(@PathVariable Long cate_id, @RequestBody BookingDomain bookingDomain) throws Exception {
 
-        Double price =  bookingDomain.getPrice();
 
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         Optional<Account> account = accountRepository.findAccountByEmail(email);
@@ -55,8 +61,7 @@ public class BookingController {
 
         /* 1. Create a booking */
         Booking booking = new Booking();
-        booking.setAccount(thisAccount); // set account for booking
-        booking.setPrice(price);
+        booking.setAccount(thisAccount);
         booking.setNote(bookingDomain.getNote());
         booking.setSurcharge(bookingDomain.getSurcharge());
         booking.setPrepayment(bookingDomain.getPrepayment());
@@ -71,7 +76,7 @@ public class BookingController {
         bookingDetail.setBooking(booking);
         bookingDetail.setCheckInTime(bookingDomain.getCheckInTime());
         bookingDetail.setCheckOutTime(bookingDomain.getCheckOutTime());
-        bookingDetail.setTotalRoom(price);
+        bookingDetail.setTotalRoom(bookingDomain.getTotal_room());
         Optional<RoomCategory> roomCategory = roomCategoryRepository.findById(cate_id);
         bookingDetail.setRoomCategory(roomCategory.get());
         bookingDetail.setStatus(true);
@@ -85,7 +90,7 @@ public class BookingController {
     @PostMapping("/admin/create/roomCategory/{cate_id}")
     public ResponseEntity<?> createABookingforAdmin(@PathVariable Long cate_id, @RequestBody BookingDomain bookingDomain) throws Exception {
 
-        Double price =  bookingDomain.getPrice();
+
 
 //        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
 //        Optional<Account> account = accountRepository.findAccountByEmail(email);
@@ -93,9 +98,6 @@ public class BookingController {
 
         /* 1. Create a booking */
         Booking booking = new Booking();
-        booking.setPrice(price);
-        booking.setNote(bookingDomain.getNote());
-        booking.setSurcharge(bookingDomain.getSurcharge());
         booking.setPrepayment(bookingDomain.getPrepayment());
         booking.setPeople(bookingDomain.getPeople());
         booking.setBookingTime(bookingDomain.getBookingTime());
@@ -125,10 +127,11 @@ public class BookingController {
             booking.setAccount(accountChecking.get());
         } else {
             unknownUserAccount.setEmail(bookingDomain.getEmail());
+            unknownUserAccount.setPhone(bookingDomain.getPhone());
             unknownUserAccount.setPassword(passwordEncoder.encode("test"));
             unknownUserProfile.setFullName(bookingDomain.getFullName());
             unknownUserProfile.setCardNumber(bookingDomain.getCardNumber());
-            unknownUserAccount.setRole(thisRole);
+            //unknownUserAccount.setRole(thisRole);
             unknownUserAccount.setProfile(unknownUserProfile);
 
             unknownUserProfile = profileRepository.save(unknownUserProfile);
@@ -150,9 +153,10 @@ public class BookingController {
         bookingDetail.setBooking(booking);
         bookingDetail.setCheckInTime(bookingDomain.getCheckInTime());
         bookingDetail.setCheckOutTime(bookingDomain.getCheckOutTime());
-        bookingDetail.setTotalRoom(price);
+
         Optional<RoomCategory> roomCategory = roomCategoryRepository.findById(cate_id);
         bookingDetail.setRoomCategory(roomCategory.get());
+        bookingDetail.setTotalRoom(bookingDomain.getTotal_room());
         bookingDetail.setStatus(true);
         bookingDetail = bookingDetailRepository.save(bookingDetail);
 
@@ -213,27 +217,22 @@ public class BookingController {
         return new ResponseEntity<>(thisBooking, HttpStatus.OK);
     }
 
-    /* Get booking to pay */
-    @GetMapping("/topay")
-    public ResponseEntity<?> getBookingDetailToPayByUser(){
+    /* Get booking by status for user
+    * To pay = 1
+    * Cancel = 3
+    * Staying = 4
+    * Complete = 2
+    *  */
+    @GetMapping("/status/{status_id}")
+    public ResponseEntity<?> getBookingDetailByStatus(@PathVariable Long status_id){
         String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
         Optional<Account> account = accountRepository.findAccountByEmail(email);
         Account thisAccount = account.get();
 
-        List<Booking> bookingToPays =  bookingRepository.findBookingDetailToPay(thisAccount.getId());
-        return new ResponseEntity<>(bookingToPays, HttpStatus.OK);
+        List<Map<String, Object>> bookingList =  bookingRepository.findBookingDetailByStatus(thisAccount.getId(), status_id);
+        return new ResponseEntity<>(bookingList, HttpStatus.OK);
     }
 
-    /* Get booking cancel */
-    @GetMapping("/cancelled")
-    public ResponseEntity<?> getBookingDetaiCancelledByUser(){
-        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-        Optional<Account> account = accountRepository.findAccountByEmail(email);
-        Account thisAccount = account.get();
-
-        List<Booking> bookingCancelleds = bookingRepository.findBookingDetailCancelled(thisAccount.getId());
-        return new ResponseEntity<>(bookingCancelleds, HttpStatus.OK);
-    }
 
     @GetMapping("/all")
     public ResponseEntity<Iterable<Booking>> getAllBooking(){
@@ -255,28 +254,6 @@ public class BookingController {
 
         List<Map<String, Object>> list =  bookingRepository.showBookingList();
         return new ResponseEntity<>(list, HttpStatus.OK);
-    }
-
-
-
-
-    /* Update Booking */
-    @PutMapping("/update/{id}")
-    public ResponseEntity<?> updateBookingById(@PathVariable Long id, @RequestBody Booking booking) throws Exception {
-        Optional<Booking> bookingID = bookingRepository.findById(id);
-
-        if(!bookingID.isPresent()){
-            throw new Exception("Service not found");
-        }
-
-        Booking thisBooking = bookingID.get();
-
-        if(booking.getPrice() != 0)
-            thisBooking.setPrice(booking.getPrice());
-
-        thisBooking = bookingRepository.save(thisBooking);
-
-        return new ResponseEntity<>(thisBooking, HttpStatus.OK);
     }
 
     /* Update account for Boooking */
@@ -307,9 +284,6 @@ public class BookingController {
     /* Update some info after booking*/
     @PutMapping("/update/id/{booking_id}")
     public ResponseEntity<?> updateCheckInInfo(@RequestBody BookingDomain bookingDomain, @PathVariable Long booking_id){
-//        String email = SecurityContextHolder.getContext().getAuthentication().getPrincipal().toString();
-//        Optional<Account> account = accountRepository.findAccountByEmail(email);
-//        Account thisAccount = account.get();
         Optional<Booking> booking = bookingRepository.findById(Long.valueOf(booking_id));
         Booking thisBooking = booking.get();
         thisBooking.setPrepayment(bookingDomain.getPrepayment());
@@ -319,6 +293,7 @@ public class BookingController {
         Optional<BookingDetail> bookingDetail = bookingDetailRepository.findBookingDetailByBookingId(thisBooking.getId());
         BookingDetail thisBookingDetail = bookingDetail.get();
         thisBookingDetail.setCheckOutTime(bookingDomain.getCheckOutTime());
+        thisBookingDetail.setTotalRoom(bookingDomain.getTotal_room());
         bookingDetailRepository.save(thisBookingDetail);
         return new ResponseEntity<>(HttpStatus.OK);
     }
