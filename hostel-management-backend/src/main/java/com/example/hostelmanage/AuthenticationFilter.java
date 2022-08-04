@@ -5,6 +5,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
@@ -20,6 +21,9 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     @Inject
     private JwtService jwtService;
 
+    @Inject
+    private UserDetailsService  userDetailsService;
+
     @Override
     protected void doFilterInternal(HttpServletRequest request,
                                     HttpServletResponse response,
@@ -29,11 +33,13 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         // Get token from Authorization header
         String jws = request.getHeader(HttpHeaders.AUTHORIZATION);
 
-        System.out.println("Filter: " + jws);
-
         if (jws != null) {
             // Verify token and get user
             String user = jwtService.getAuthUser(request);
+
+            System.out.println(user);
+
+            //UserDetails userDetails = userDetailsService.loadUserByUsername(user);
 
             // Authenticate
             Authentication authentication =
